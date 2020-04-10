@@ -44,9 +44,29 @@ class HashTable:
 
 
     def insert(self, key, value):
+        index = self._hash_mod(key)
+        if self.storage[index] is not None:
+            print('WARN: Collision detected for key ' + key)
+        self.storage[index] = LinkedPair(key, value)
+        #current = self.storage[index] # Pair at current index
+        #last = None # Pair to insert
+        # Check if current location is empty
+        # Handle collisions by adding new LinkedPair
+        #while current and current.key != key:
+            #last = current
+            #current = last.next
+        # If a current is found with same key
+        #if current:
+            #current.value = value
+        # If a current is not found
+        #else:
+            #new = LinkedPair(key, value)
+            #new.next = self.storage[index]
+            #self.storage[index] = new
+      
         '''
         Store the value with the given key.
-
+ 
         # Part 1: Hash collisions should be handled with an error warning. (Think about and
         # investigate the impact this will have on the tests)
 
@@ -54,9 +74,6 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
-
 
     def remove(self, key):
         '''
@@ -66,9 +83,9 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
-
+        index = self._hash_mod(key)
+        self.storage[index] = None
+            
     def retrieve(self, key):
         '''
         Retrieve the value stored with the given key.
@@ -77,19 +94,28 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        index = self._hash_mod(key)
+        if self.storage[index] is None:
+            print(f"error")
+            return  None
+        return self.storage[index].value
 
     def resize(self):
         '''
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
-
+        
         Fill this in.
-        '''
-        pass
-
-
+               '''
+        old_storage = self.storage
+        self.capacity *= 2
+        # create an new array size *2
+        self.storage = [None] * self.capacity
+        # move all values over
+        for pair in old_storage:
+            #reinsert all key
+            if pair is not None:
+                self.insert(pair.key, pair.value)
 
 if __name__ == "__main__":
     ht = HashTable(2)
