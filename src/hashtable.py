@@ -45,24 +45,31 @@ class HashTable:
 
     def insert(self, key, value):
         index = self._hash_mod(key)
-        if self.storage[index] is not None:
-            print('WARN: Collision detected for key ' + key)
-        self.storage[index] = LinkedPair(key, value)
-        #current = self.storage[index] # Pair at current index
-        #last = None # Pair to insert
-        # Check if current location is empty
-        # Handle collisions by adding new LinkedPair
-        #while current and current.key != key:
-            #last = current
-            #current = last.next
-        # If a current is found with same key
-        #if current:
-            #current.value = value
-        # If a current is not found
+        #if self.storage[index] is not None:
+            #print('WARN: Collision detected for key ' + key)
+            #current = self.storage[index] #(key1, value)
+            #prev = current
+            #while current is not None:
+                #prev = current
+                #current = current.next #at the end of the chain the last node will have self.next == None so current become None and while loop get break so the prev.next will be the new node
+            #prev.next = LinkedPair(key, value)
         #else:
-            #new = LinkedPair(key, value)
-            #new.next = self.storage[index]
-            #self.storage[index] = new
+            #self.storage[index] = LinkedPair(key, value)
+        current = self.storage[index] # Pair at current index
+        prev = None # Pair to insert
+        #Check if current location is empty
+        # Handle collisions by adding new LinkedPair
+        while current and current.key != key:
+            prev = current
+            current = prev.next
+        # If a current is found with same key
+        if current:
+            current.value = value
+        # If a current is not found
+        else:
+            new = LinkedPair(key, value)
+            new.next = self.storage[index]
+            self.storage[index] = new
       
         '''
         Store the value with the given key.
@@ -84,7 +91,14 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        self.storage[index] = None
+        current = self.storage[index]
+        while current is not None and current.key != key:
+            current = current.next
+        if current is None:
+            return None
+        else:
+            self.storage[index] = None 
+        
             
     def retrieve(self, key):
         '''
@@ -95,10 +109,15 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        if self.storage[index] is None:
-            print(f"error")
-            return  None
-        return self.storage[index].value
+        current = self.storage[index]
+        if current is None:
+            return None
+        while current is not None and current.key != key:
+            current = current.next
+        if current is None: # when while break with current = None 
+            return None
+        else:# when while break with current.key == key
+            return current.value
 
     def resize(self):
         '''
@@ -107,15 +126,22 @@ class HashTable:
         
         Fill this in.
                '''
-        old_storage = self.storage
-        self.capacity *= 2
+        self.capacity *=2 # double the Array size
+        new_storage = [None] * self.capacity 
+        # move all elements from old Array, into new one
+        for i in range(len(self.storage)):
+            new_storage[i] = self.storage[i]
+        # set the mew array to storage
+        self.storage = new_storage
+        #old_storage = self.storage
+        #self.capacity *= 2
         # create an new array size *2
-        self.storage = [None] * self.capacity
+        #self.storage = [None] * self.capacity
         # move all values over
-        for pair in old_storage:
+        #for pair in old_storage:
             #reinsert all key
-            if pair is not None:
-                self.insert(pair.key, pair.value)
+            #if pair is not None:
+                #self.insert(pair.key, pair.value)      
 
 if __name__ == "__main__":
     ht = HashTable(2)
